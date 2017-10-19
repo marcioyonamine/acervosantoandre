@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>CLARA.CCSP - v0.1 - 2016</title>
+<title>Acervos Culturais Santo André - v0.1 - 2017</title>
     <link href="visual/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="visual/css/style.css" rel="stylesheet" media="screen">
 	<link href="visual/color/default.css" rel="stylesheet" media="screen">
@@ -14,8 +14,20 @@
 <?php 
 
 /*
-igSmc v0.1 - 2015
-ccsplab.org - centro cultural são paulo
+SCPSA v0.1 - 2017
+
+titulo nome.titulo_titulo.conteudo_conteudo
+autor
+descricao descricao.dados_procedencia.circula_referencia.producao_local.producao_funcaoOriginal.conteudo_descricao.descricao_array.classificao_nome
+
+
+Localização: localizacao localizao_padrao
+Procedência: procedencia
+Local: producao_local
+
+
+
+
 */
 
 // Esta é a página de login do usuário ou de contato com administrador do sistema.
@@ -31,7 +43,37 @@ include "../funcoes/funcoesConecta.php";
 
 if(isset($_GET['pesquisa'])){
 	$con = bancoMysqli();
-	$pesquisa = $_GET['pesquisa'];	
+	$pesquisa = $_GET['pesquisa'];
+	switch($_GET['acervo']){
+		
+		case 1:
+		$acervo = " AND acervo = '1' ";
+		
+		break;	
+
+		case 2:
+		$acervo = " AND acervo = '2' ";
+		
+		break;	
+
+		case 3:
+		$acervo = " AND acervo = '3' ";
+		
+		break;	
+
+		case 4:
+		$acervo = " AND acervo = '4' ";
+		
+		break;	
+
+
+		default;
+		$acervo = "";
+		
+		break;	
+	
+		
+	}	
 	
 	// roda a tabela registro pela palavra
 	
@@ -41,14 +83,7 @@ if(isset($_GET['pesquisa'])){
 	
 //	$sql_busca_registro = "SELECT DISTINCT id_registro FROM acervo_registro,acervo_relacao_termo  WHERE acervo_relacao_termo.idReg = acervo_registro.id_registro AND (acervo_registro.titulo LIKE '%$pesquisa%' OR acervo_registro.id_registro IN (SELECT DISTINCT idRel FROM acervo_termo WHERE termo LIKE '%$pesquisa%' AND publicado = '1')) AND acervo_registro.publicado = '1' ";
 	
-	$sql_busca_registro = "SELECT DISTINCT acervo_registro.id_registro 
-							FROM acervo_registro
-							INNER JOIN acervo_relacao_termo ON (acervo_registro.id_registro = acervo_relacao_termo.idReg)
-							INNER JOIN acervo_termo ON (acervo_relacao_termo.idTermo = acervo_termo.id_termo)
-							WHERE (acervo_registro.titulo LIKE '%$pesquisa%' OR acervo_termo.termo LIKE '%$pesquisa%') 
-							AND acervo_registro.publicado = 1 
-							AND acervo_relacao_termo.publicado = 1
-							AND acervo_termo.publicado = 1";
+	$sql_busca_registro = "SELECT * FROM acervo_index WHERE comum LIKE '%$pesquisa%' $acervo";
 
 	/*SELECT tabela1.campos, tabela2.campos 
 FROM tabela1 
@@ -73,12 +108,12 @@ WHERE tabela1.campo=valor
 	}
 	$inicio = $pc - 1;
 	$inicio = $inicio*$total_pagina;
-	$limite = mysqli_query($con,"$sql_busca_registro LIMIT $inicio,$total_pagina");
+	$limite = mysqli_query($con,"$sql_busca_registro $acervo LIMIT $inicio,$total_pagina ");
 	$total = $num01;
 	
 	$tp = $total/$total_pagina;
 	 
-	$mensagem = "Foram encontrados $num01 registros para '$pesquisa' em $tempo s.";
+	$mensagem = "Foram encontrados $num01 registros para '$pesquisa' em $tempo s. <br />";
 	
 	
 
@@ -90,7 +125,7 @@ WHERE tabela1.campo=valor
 			  <div class="row">
 				  <div class="col-md-offset-2 col-md-8">
 					<div class="section-heading">
-					 <h3>Acervos CCSP</h3>
+					 <h3>Acervos Culturais de Santo André</h3>
                     
 
 					</div>
@@ -109,67 +144,16 @@ WHERE tabela1.campo=valor
 				<br />             
 				<?php 
 				while($res = mysqli_fetch_array($limite)){
-					$reg = recuperaDados("acervo_registro",$res['id_registro'],"id_registro");
-					$colecao = recuperaDados("acervo_acervos",$reg['id_acervo'],"id_acervo");
-					$autoridades = retornaAutoridades($res['id_registro']);
-
-					$termos = retornaTermos($res['id_registro']);
-					switch($reg['tabela']){
-						case 87:
-							$dados = recuperaDados("acervo_discoteca",$reg['id_tabela'],"idDisco");
-							$lista_autoridade = $autoridades['string'];
-							$tombo = $dados['tombo'];
-							if($autoridades['string'] == "" AND $dados['planilha'] == 18){
-								$idReg = idReg($dados['matriz'],87);
-								$aut = retornaAutoridades($idReg);
-								$lista_autoridade = $aut['string'];
-								$matriz = recuperaDados("acervo_discoteca",$idReg,"idDisco");
-								if($dados['tombo'] == NULL){
-									$tombo = $matriz['tombo'];
-								}
-							
-							}										
-						break;
-						
-						case 97:
-							$dados = recuperaDados("acervo_partituras",$reg['id_tabela'],"idDisco");						
-								$lista_autoridade = $autoridades['string'];
-							$tombo = $dados['tombo'];
-							if($autoridades['string'] == "" AND $dados['planilha'] == 18){
-								$idReg = idReg($dados['matriz'],97);
-								$aut = retornaAutoridades($idReg);
-								$lista_autoridade = $aut['string'];
-								$matriz = recuperaDados("acervo_partituras",$idReg,"idDisco");
-								if($dados['tombo'] == NULL){
-									$tombo = $matriz['tombo'];
-								}
-
-							}
-							
-						break;
-											
-					}
-
-				?>
+				
+				?>	
 	            <div class="form-group">
 		            <div class="col-md-offset-2 col-md-8">
                <div class="left">
 
-				<h6><?php echo $reg['titulo']; ?> <?php if($dados['planilha'] == 17){echo " (Matriz)"; }else{ echo " (Analítica)"; } ?></h6>
-                <p><?php 
-									
-				//var_dump(retornaAutoridades($reg['id_registro']));
-				?></p>
-               
-                <p>Tombo: <?php 
-				
-					echo $tombo; 
+				<?php 
+				exibeRegistro($res['acervo'],$res['idAcervo']);
+				?>						
 
-				
-				?>  <?php if($reg['tabela'] == 97){ echo " / ".$dados['tombo_antigo']; }?> </p>
-                <p>Autoridades: <?php echo $lista_autoridade; ?> </p>
-                <p>Assuntos:<?php echo $termos['string']; ?> </p>
-				 <p>Coleção: <?php echo $colecao['acervo']; ?></p>
                 			    </div>
 				</div>		            
         	    </div>
@@ -186,11 +170,11 @@ WHERE tabela1.campo=valor
 				$anterior = $pc - 1;
 				$proximo = $pc + 1;
 				if($pc > 1){
-					echo "<a href='?pesquisa=$pesquisa&n_pagina=$anterior'><- Anterior</a>";
+					echo "<a href='?pesquisa=$pesquisa&acervo=".$_GET['acervo']."&n_pagina=$anterior'><- Anterior</a>";
 				}
 				echo " | ";
 				if($pc < $tp) {
- 				 echo " <a href='?pesquisa=$pesquisa&n_pag=$proximo'>Próxima -></a>";
+ 				 echo " <a href='?pesquisa=$pesquisa&acervo=".$_GET['acervo']."&n_pag=$proximo'>Próxima -></a>";
  				 }
 				?>            
             </div>
@@ -218,7 +202,7 @@ WHERE tabela1.campo=valor
 			  <div class="row">
 				  <div class="col-md-offset-2 col-md-8">
 					<div class="section-heading">
-					 <h2>Acervos CCSP</h2>
+					 <h2>Acervos Culturais de Santo André</h2>
                      <p>Os campos em que ocorrerá a busca são: título, autor, assunto</p>
                      <p>É possível pesquisar por parte da palavra. Deve-se ter pelo menos 3 caracteres para busca.</p>
                     
@@ -236,6 +220,14 @@ WHERE tabela1.campo=valor
                     
                     
             		<input type="text" name="pesquisa" class="form-control" id="palavras" placeholder="" ><br />
+                    <select name="acervo">
+                    <option value="0">Todos os Acervos Culturais</option>
+                    <option value="1">Biblioteca</option>
+                    <option value="2">Acervo de Artes</option>
+                    <option value="3">Museu Base Nova</option>
+                    <option value="4">Museu Base Antiga</option>
+
+                    </select>
 
             	</div>
              </div>

@@ -1,8 +1,8 @@
 <?php 
 
 /*
-igSmc v0.1 - 2015
-ccsplab.org - centro cultural são paulo
+acervos v0.1 - 2017
+secretaria de cultura da prefeitura de santo andré
 
 Esta é a página para as funções gerais do sistema.
 
@@ -247,6 +247,66 @@ function diferencaDatas($data_inicial,$data_final){
 	return $dias;
 
 }
+
+function existeColuna($tabela,$coluna){
+	$con = bancoMysqli();
+	$sql = "SELECT $coluna FROM $tabela";
+	$query = mysqli_query($con,$sql);
+	if($query){
+		return TRUE;	
+	}else{
+		return FALSE;	
+	}
+}
+
+/*
++ os indices das arrays devem conter os nomes dos campos
++ os tratamentos dos dados (data, dinheiro) deve ser feito antes da função
++ addslashes está habilitado em todos os campos
+*/
+function manipulaDados($tabela,$array,$campo = NULL,$id = NULL){ 
+	$con = bancoMysqli();
+	$keys = array_keys($array);
+	
+	if($campo == NULL){ //insere
+	
+		$campos = "";
+		$valores = "";
+		foreach($keys as $x){
+			if(existeColuna($tabela,$x) == TRUE){
+				$campos .= "`".$x."`,";
+				$valores .= "'".addslashes($array[$x])."',"; 	
+			}
+		}		
+		$campos = substr($campos,0,-1);
+		$valores = substr($valores,0,-1);
+		$sql = "INSERT INTO `$tabela` ($campos) VALUES ($valores);";
+		$query = mysqli_query($con,$sql);
+		if($query){
+			return mysqli_insert_id($con);
+		}else{
+			return FALSE;
+		}
+
+	}else{ // atualiza
+		$query_update = "";
+		foreach($keys as $x){
+			if(existeColuna($tabela,$x) == TRUE){
+				$query_update .= "`".$x."` = '".addslashes($arry[$x]).", ";
+			}
+		}		
+		$query_update = substr($query_update,0,-1);
+		$sql = "UPDATE $tabela SET $query_update WHERE $campo = '$id'";
+		$query = mysqli_query($con,$sql);
+		if($query){
+			return mysqli_insert_id($con);
+		}else{
+			return FALSE;
+		}
+	}
+}
+
+
 
 function geraTipoOpcao($abreviatura,$select = 0){
 	$con = bancoMysqli();
@@ -940,7 +1000,7 @@ return $extensao;
 	
 }
 
-function retornaAutoridades($registro,$analitica = NULL){
+function retornaAutoridades($registro,$analitica = NULL,$categoria = NULL){
 	$con = bancoMysqli(); //conecta no banco
 	// seleciona todos os termos autoridades ligados ao registro
 	
@@ -965,7 +1025,11 @@ function retornaAutoridades($registro,$analitica = NULL){
 			$str = ",";
 			$string = "";
 			for($a = 0; $a <= ($num - 1); $a++){
-				$str = ", ".$x[$a]['termo']." ( ".$x[$a]['categoria']. " ) ";
+				if($categoria == NULL){
+					$str = ", ".$x[$a]['termo']." ( ".$x[$a]['categoria']. " ) ";
+				}else{
+					$str = ", ".$x[$a]['termo'];
+				}
 				$string = $string.$str;
 			} 	
 	
@@ -1048,10 +1112,26 @@ function recuperaIdTemp($id,$tabela){
 		case 97:
 			$sql = "SELECT idDisco FROM acervo_partitura WHERE idTemp = '$id' LIMIT 0,1";
 		break;		
+		case 126:
+			$sql = "SELECT id FROM acervo_artes WHERE idAntigo = '$id' LIMIT 0,1";
+		break;		
+
+
 	}
 	$query = mysqli_query($con,$sql);
 	$x = mysqli_fetch_array($query);
-	return $x['idDisco'];
+	switch($tabela){
+	
+	case 87:
+	case 97:
+		return $x['idDisco'];
+	break;
+	
+	case 126:
+		return $x['id'];
+	break;
+		
+	}
 }
 
 function retiraTitulo($string){
@@ -1321,5 +1401,106 @@ function dimensao($string){
 	return $x;
 }
 
+function blank($string){
+	if(preg_match("/array/",$string)){
+		return "";	
+	}else{
+		return $string;	
+	}	
+}
 
+function exibeRegistro($acervo,$id){
+	$con = bancoMysqli();
+	
+	switch($acervo){
+	
+	case 1:	 // biblioteca;
+	$dados = recuperaDados("alx_geral",$id,"TIT_ID");
+	echo "<p>Título:<strong> ".$dados['TIT_TIT']."</strong></p>";
+	echo "<p>Autor: ".$dados['TIT_AUT']."</p>";
+	echo "<p>Editora: ".$dados['TIT_EDT']."</p>";
+	echo "<p>Ano: ".$dados['TIT_DATA']."</p>";
+	echo "<p>Chamada: ".$dados['TIT_CHAMADA']."</p>";
+	echo "<p>Acervo: Biblioteca</p>";
+	echo "<br />";
+		echo "<hr />";
+	
+	
+	break;
+	
+	case 2:	 // artes
+	$dados = recuperaDados("temp_artes",$id,"id");
+	echo "<p>Título: <strong>".$dados['titulo']."</strong></p>";
+	echo "<p>Artista: ".$dados['autor']."</p>";
+	echo "<p>Técnica: ".$dados['tecnica']."</p>";
+	echo "<p>Ano: ".$dados['ano_obra']."</p>";
+	echo "<p>Acervo: Acervo de Artes</p>";
+	echo "<br />";
+		echo "<hr />";
+	
+	break;
+	
+	case 3: // museu
+	
+	$dados = recuperaDados("temp_museu",$id,"id");
+	echo "<p>Título:<strong> ".$dados['DS_NOME']." ".$dados['DS_OUTRO_NOME']." ".$dados['DS_TITULO']."</strong></p>";
+	echo "<p>Legenda: ".$dados['DS_LEGENDA']."</p>";
+	echo "<p>Acervo: Base Nova Museu</p>";
+	echo "<br />";
+		echo "<hr />";
+	
+	
+	break;
+
+	case 4: // museu antigo
+	
+	$dados = recuperaDados("temp_museu_antigo",$id,"id");
+	echo "<p>Título:<strong> ".blank($dados['nome'])." ".blank($dados['titulo_titulo'])." ".blank($dados['conteudo_conteudo'])."</strong></p>";
+	if(blank($dados['descricao']) != ""){ echo "<p> Descrição: ".blank($dados['descricao'])."</p>"; }
+	if(blank($dados['dados_procedencia']) != ""){ echo "<p> Procedência: ".blank($dados['dados_procedencia'])."</p>"; }
+	if(blank($dados['circulacao_referencia']) != ""){ echo "<p> Circulação: ".blank($dados['circulacao_referencia'])."</p>"; }
+	if(blank($dados['producao_local']) != ""){ echo "<p> Local de produção: ".blank($dados[''])."</p>"; }
+	if(blank($dados['producao_funcaoOriginal']) != ""){ echo "<p>Função original: ".blank($dados[''])."</p>"; }
+	if(blank($dados['conteudo_descricao']) != ""){ echo "<p>Conteúdo: ".blank($dados['conteudo_descricao'])."</p>"; }
+	if(blank($dados['descricao_array']) != ""){ echo "<p>Descrição (2): ".blank($dados['descricao_array'])."</p>"; }
+	if(blank($dados['classificacao_nome']) != ""){ echo "<p>Classifciação: ".blank($dados['classificacao_nome'])."</p>"; }
+	echo "<p>Acervo: Museu Antigo Java 2008</p>";
+	if(blank($dados['arquivo']) != ""){ echo "<img src='arquivos/".$dados['arquivo']."' width='300' height='auto' />"; }
+	echo "<br />";
+		echo "<hr />";
+	
+	
+	break;
+	
+	}
+
+	
+}
+
+function geraMarcaDagua($inicial,$logo_imagem){
+   $imagem_original = $inicial; //nome da imagem original
+   $logo_img = $logo_imagem; //nome da logo (utilize png ou gif com fundo transparente)
+   $padding = 10; //define o espaço que a logo terá no lado esquerdo e na parte de baixo
+   $opacidade = 80; //define a porcentagem de transparência da logo
+   $logo = imagecreatefromgif($logo_img); //cria a logo
+   $imagem = imagecreatefromjpeg($imagem_original); //cria a imagem original
+   if(!$imagem || !$logo) die("Erro: imagem original ou logo não foram carregadas!"); //verificar se as imagens foram carregadas
+     
+   $logo_size = getimagesize($logo_img); //obtêm as dimensões da logo
+   $logo_width = $logo_size[0]; //atribui a largura da logo
+   $logo_height = $logo_size[1]; //atribui a altura da logo
+   $imagem_size = getimagesize($imagem_original); //obtêm as dimensões da imagem original
+   $dest_x = $imagem_size[0] - $logo_width - $padding;//define a posição horizontal que a logo se posicionará
+   $dest_y = $imagem_size[1] - $logo_height - $padding;//define a posição vertical que a logo se posicionará
+     
+   imagecopymerge($imagem, $logo, $dest_x, $dest_y, 0, 0, $logo_width, $logo_height, $opacidade);//cópia marca d'água na imagem original
+     
+   // exibe a imagem com a marca d'água aplicada
+   header("content-type: image/jpeg");
+   imagejpeg($imagem);
+   imagedestroy($imagem);
+   imagedestroy($logo);
+   
+}
 ?>
+

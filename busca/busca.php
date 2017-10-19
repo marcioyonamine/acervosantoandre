@@ -13,22 +13,14 @@
 <body>
 <?php 
 
-/*
-igSmc v0.1 - 2015
-ccsplab.org - centro cultural são paulo
-*/
-
-// Esta é a página de login do usuário ou de contato com administrador do sistema.
-
-//Imprime erros com o banco
 
 
 include "funcoes/funcoesGerais.php";
 function bancoMysqli(){ 
 	$servidor = 'localhost';
 	$usuario = 'root';
-	$senha = 'lic54eca';
-	$banco = 'discoteca';
+	$senha = '';
+	$banco = 'sc_acervos';
 	$con = mysqli_connect($servidor,$usuario,$senha,$banco); 
 	mysqli_set_charset($con,"utf8");
 	return $con;
@@ -37,18 +29,7 @@ function bancoMysqli(){
 if(isset($_POST['pesquisa'])){
 	$con = bancoMysqli();
 	$pesquisa = $_POST['pesquisa'];	
-	$sql_busca = "SELECT * FROM acervo2 WHERE 
-	`autoridades` LIKE '%$pesquisa%' OR
-	`titulo_disco` LIKE '%$pesquisa%' OR
-	`titulo_faixa` LIKE '%$pesquisa%' OR
-	`titulo_uniforme` LIKE '%$pesquisa%' OR
-	`conteudo` LIKE '%$pesquisa%' OR
-	`resumo_titulo` LIKE '%$pesquisa%' OR
-	`forma_genero` LIKE '%$pesquisa%' OR
-	`meio_expressao` LIKE '%$pesquisa%' OR
-	`assunto` LIKE '%$pesquisa%' OR
-	`descritores` LIKE '%$pesquisa%'
-	ORDER BY `tombo`";
+	$sql_busca = "SELECT * FROM acervo_index WHERE comum LIKE '%$pesquisa%'";
 	 $resultado = mysqli_query($con,$sql_busca);
 	 $num = mysqli_num_rows($resultado);
 	 if($num == 0){
@@ -86,21 +67,29 @@ if(isset($_POST['pesquisa'])){
 	            <div class="form-group">
 		            <div class="col-md-offset-2 col-md-8">
                <div class="left">
-
-				<h6><?php echo $res['resumo_titulo']; ?></h6>
-								<strong>Localização/Tombo:</strong> <?php echo $res['tombo']; ?><br />
-				<strong>Autor:</strong> <?php 
-				//echo $res['autoridades']; 
-				echo preg_replace("/($pesquisa)/is", "<i><b>\\1</b></i>", $res['autoridades']);
+				<h6><?php echo $res['idAcervo']; ?></h6>
+				<p>
+				<?php 
+				switch($res['acervo']){
 				
-				?><br />
-				<strong>Tipo:</strong> <?php echo  preg_replace("/($pesquisa)/is", "<i><b>\\1</b></i>", $res['tipo_especifico']); ?><br />
-				<strong>Forma/Gênero:</strong> <?php echo  preg_replace("/($pesquisa)/is", "<i><b>\\1</b></i>", $res['forma_genero']); ?><br />
-				<strong>Meio de Expressão:</strong> <?php echo  preg_replace("/($pesquisa)/is", "<i><b>\\1</b></i>", $res['meio_expressao']); ?><br />
+				case 1:
+				echo "Biblioteca";
+				break;
 
-				<strong>Assuntos/Descritos:</strong> <?php echo  preg_replace("/($pesquisa)/is", "<i><b>\\1</b></i>", $res['assunto']); ?><br />
-				<?php echo  preg_replace("/($pesquisa)/is", "<i><b>\\1</b></i>", $res['descritores']); ?><br />
-				<strong>Notas:</strong> <?php echo  preg_replace("/($pesquisa)/is", "<i><b>\\1</b></i>", $res['notas']); ?><br /><br /><br />
+				case 2:
+				echo "Acervo de Artes";
+				break;
+
+				case 3:
+				echo "Museu Histórico";
+				break;
+				
+					
+					
+				}
+				
+				?>
+                <p>			
                </div>
 				</div>		            
         	    </div>

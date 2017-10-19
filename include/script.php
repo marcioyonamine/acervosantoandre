@@ -9,6 +9,11 @@
   $(function(){
 	$( "#hora" ).mask("99:99");
   });
+
+  $(function(){
+	$( ".ano" ).mask("9999");
+  });
+
  
     $(function() {
     $('#valor').maskMoney({thousands:'', decimal:',', allowZero:true, suffix: ''});
@@ -28,6 +33,7 @@
   $(function() {
     $('.soNumero').maskMoney({thousands:'', decimal:'', allowZero:true, suffix: ''});
   })
+
   $(function(){
 	$("#CEP").mask("99999-999");
   });

@@ -1,0 +1,93 @@
+﻿tipos de ocorrência
+
+declaração de valor
+declaração de estado de conservação
+declaração de procedência
+declaração de saída para empréstimo
+declaração de retorno de empréstimo
+declaração de movimentação
+declaração de visita / pesquisa
+
+
+campos extras acervo de artes
+
+mancha_altura ok
+mancha_largura ok
+
+impressor (?)
+
+passepartout_altura ok
+passepartout_largura ok
+
+moldura_altura ok
+moldura_largura ok
+moldura_profundidade ok
+moldura_material ok
+	
+categoria (extra ? fechado)
+técnica (fechado)
+suporte ( fechado)
+gênero (fora) 
+acondiciamento (aberto ?)
+
+inscrições de obra (frente, verso) longtext (tipo de upload)
+assinatura e data da inscrição longtext (tipo de upload)
+
+estados (declaração / valores) (tipo)
+	amarelamento
+	craquelês
+	danos por iluminação
+	descoloramento
+	dobras/vincos
+	estolamentos
+	fitas adesivas/cola
+	fungos/xilófagos
+	furos
+	manchas/nódoas
+	ondulaçãoes
+	oxidação
+	perda de pigmentos
+	problemas de chasis
+	problemas na moldura
+	quebrada/lacrada
+	rasgos
+	riscos
+	sujeira
+	trincas
+	outros
+
+Obs do artista
+
+	
+tabela: acervo_contato
+	id
+	idTab
+	idAutor
+	contato
+	cep
+	endereco
+	numero
+	complemento
+	bairro
+	cidade
+	estado
+	caixa_postal
+	email
+	obs
+	
+tabela: acervo_autor
+	id
+	idTermo
+	nome
+	sobrenome
+	nome_artistico
+	grupo
+	data_nascimento
+	ano_nascimento
+	ano_morte
+	data_morte
+	sexo
+	obs
+	
+Requisição pesquisa biblioteca:
+http://www.santoandre.sp.gov.br/pesquisa/con_geral.asp?form=default&cbo=todos&ScriptName=default.asp&Txtbusca=drummond&search.x=0&search.y=0&tipo=p

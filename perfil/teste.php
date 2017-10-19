@@ -17,22 +17,10 @@ if(isset($_GET['registro'])){
 					<div class="section-heading">
 					 <h3>Teste</h3>
 					<?php
-					
-					/*
-					$con = bancoMysqli();
-					$sql = "SELECT * FROM igsis_pedido_contratacao WHERE publicado = '1'";
-					$query = mysqli_query($con,$sql);
-					while($pedido = mysqli_fetch_array($query)){
-						$idPedido = $pedido['idPedidoContratacao'];
-						echo "O pedido $idPedido tem o estado ".$pedido['estado'].".<br />";
-						$txt = atualizaStatus($idPedido);
-						echo $txt."<br /><br />";
-					}
-					*/
-					$x = reAnaliticas(1);
-					echo "<pre>";
-					var_dump($x);					
-					echo "</pre>";
+					$coluna = "ip";
+					$tabela = "igsis_time";
+					var_dump(existeColuna($tabela,$coluna));	
+				
 
 					?>
 

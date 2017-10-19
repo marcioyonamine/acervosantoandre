@@ -1,7 +1,10 @@
 <?php
 $con = bancoMysqli();
 include 'includes/menuSonoro.php';
-
+if(isset($_POST['cadastraRegistro'])){
+	$x = manipulaDados("acervo_artes",$_POST);
+	
+}
 
 ?>
 
@@ -10,6 +13,7 @@ include 'includes/menuSonoro.php';
 	  	<div class="container">
 			  <div class="form-group">
 					<h3>Obra de Arte</h3>
+                    <p><?php var_dump($x);?></p>
                     <br />
                     <br />
                </div>
@@ -17,7 +21,7 @@ include 'includes/menuSonoro.php';
 	  		<div class="row">
 	  			<div class="col-md-offset-1 col-md-10">
 
-				<form class="form-horizontal" role="form" action="?perfil=discoteca&p=frm_atualiza_sonoro" method="post">
+				<form class="form-horizontal" role="form" action="?perfil=artes&p=sc_insere_obra" method="post">
                   <div class="form-group">
 					<div class="col-md-offset-2 col-md-8"><strong>Coleção</strong><br/>
                 	  <select class="form-control" id="tipoDocumento" name="colecao" >
@@ -27,11 +31,13 @@ include 'includes/menuSonoro.php';
 					  </select>
                       </div>
 				  </div>	
-                  <div class="form-group">
-					<div class="col-md-offset-2 col-md-8"><strong>Tombo / Localização</strong><br/>
-					  <input type="text" class="form-control" id="tombo" name="tombo"  value="" >
-                      </div>
-				  </div>	
+				  <div class="form-group">
+					<div class="col-md-offset-2 col-md-8"><strong>Título:</strong><br/>
+					  <input type="text" class="form-control" id="Nome" name="titulo"  value="" >
+					</div>
+				  </div>
+
+                 <!--
 				  <div class="form-group">
 					<div class="col-md-offset-2 col-md-6"><strong>Tipo Geral:</strong><br/>
 					  <select class="form-control" id="planilha" name="geral" >
@@ -48,117 +54,70 @@ include 'includes/menuSonoro.php';
 						?>  
 					  </select>
 					</div>
-				  </div>
+				  </div>-->
 				   <div class="form-group">
-					<div class="col-md-offset-2 col-md-6"><strong>Número de Faixas:</strong><br/>
-					  <input type="text" class="form-control soNumero" id="duracao" name="faixas"  value="" >
+					<div class="col-md-offset-2 col-md-6"><strong>Salão:</strong><br/>
+					  <input type="text" class="form-control soNumero" id="salao" name="salao"  value="" >
 
 					</div>				  
-					<div class=" col-md-6"><strong>Exemplares:</strong><br/>
-					  <input type="text" class="form-control soNumero" id="duracao" name="exemplares"  value="" >
+					<div class=" col-md-6"><strong>Ano de Aquisição:</strong><br/>
+					  <input type="text" class="form-control ano" id="ano_aq" name="ano_aq"  value="" >
+
+					</div>	
+				  </div>
+		   <div class="form-group">
+           				<div class="col-md-offset-2 col-md-6"><strong>Ano de Assinatura:</strong><br/>
+					  <input type="text" class="form-control ano" id="ano_as" name="ano_as"  value="" >
 					</div>
-				  </div>
-                  <div class="form-group">
-					<div class="col-md-offset-2 col-md-8"><br/>
-					<h5>Imprenta</h5>
-                      </div>
-				  </div>
+					<div class=" col-md-6"><strong>Patrimônio:</strong><br/>
+					  <input type="text" class="form-control soNumero" id="ano_aq" name="patrimonio"  value="" >
+
+					</div>				  
+					
+		  </div>                  
+		   <div class="form-group">
+           				<div class="col-md-offset-2 col-md-6"><strong>Número de Processo:</strong><br/>
+					  <input type="text" class="form-control soNumero" id="ano_as" name="processo"  value="" >
+					</div>
+					<div class=" col-md-6"><strong>Altura (CM):</strong><br/>
+					  <input type="text" class="form-control soNumero" id="ano_aq" name="altura"  value="" >
+
+					</div>				  
+					
+		  </div>                  
+		   <div class="form-group">
+           				<div class="col-md-offset-2 col-md-6"><strong>Largura (CM):</strong><br/>
+					  <input type="text" class="form-control soNumero" id="ano_as" name="largura"  value="" >
+					</div>
+					<div class=" col-md-6"><strong>Profundidade (CM):</strong><br/>
+					  <input type="text" class="form-control soNumero" id="ano_aq" name="profundidade"  value="" >
+
+					</div>				  
+					
+		  </div>                  
+		   <div class="form-group">
+					<div class="col-md-offset-2 col-md-6"><strong>Moeda:</strong><br/>
+                	  <select class="form-control" id="geral" name="moeda" >
+					   <?php
+						geraTipoOpcao("moeda");
+						?>  
+					  </select>
+					</div>
+					<div class=" col-md-6"><strong>Valor:</strong><br/>
+					  <input type="text" class="form-control valor" id="valor" name="valor"  value="" >
+
+					</div>				  
+					
+		  </div>   
+                            <div class="form-group">
+					<div class="col-md-offset-2 col-md-8"><strong>Localização *:</strong><br/>
+					  <input type="text" class="form-control" id="Nome" name="localizacao"  value="" >
+					</div>
+				  </div>               
+
+
 			 
-                  <div class="form-group">
-					<div class="col-md-offset-2 col-md-8"><strong>Gravadora</strong><br/>
-                	  <select class="form-control" id="tipoDocumento" name="gravadora" >
-					   <?php
-						opcaoTermo(12);
-						?>  
-					  </select>
-                      </div>
-				  </div>
-				  <div class="form-group">
-					<div class="col-md-offset-2 col-md-8"><strong>Registro:</strong><br/>
-					  <input type="text" class="form-control" id="Nome" name="registro"  value="" >
-					</div>
-				  </div>
-				  <div class="form-group">
-					<div class="col-md-offset-2 col-md-6"><strong>Tipo de data:</strong><br/>
-                    <select class="form-control" id="tipoDocumento" name="tipo_data" >
-					   <?php
-						geraTipoOpcao("data");
-						?> 
-                        </select> 
-					</div>				  
-					<div class=" col-md-6"><strong>Data da gravação:</strong><br/>
-					  <input type="text" class="form-control" id="CCM" name="data_gravacao"  value="" >
-					</div>
-				  </div>
-
-
-                  <div class="form-group">
-					<div class="col-md-offset-2 col-md-8"><strong>Local da gravação:</strong><br/>
-					                	  <select class="form-control" id="tipoDocumento" name="local" >
-					   <option>Selecione o local da gravação</option>
-
-					  <?php
-						opcaoTermo(14);;
-						?>  
-					  </select>
-					</div>
-				  </div>
-                  <div class="form-group">
-					<div class="col-md-offset-2 col-md-8"><br/>
-					<h5>Descrição Física</h5>
-                      </div>
-				  </div>
-                  <div class="form-group">
-					<div class="col-md-offset-2 col-md-8"><strong>Tipo:</strong><br/>
-					                	  <select class="form-control" id="tipoDocumento" name="fisico" >
-					   <?php
-						geraTipoOpcao("fisico");
-						?>  
-					  </select>
-					</div>
-				  </div>
-				  
-				  <div class="form-group">
-					<div class="col-md-offset-2 col-md-6"><strong>Estereo/Mono:</strong><br/>
-					                	  <select class="form-control" id="tipoDocumento" name="estereo" >
-					   <?php
-						geraTipoOpcao("estereo");
-						?>  
-					  </select>					</div>				  
-					<div class=" col-md-6"><strong>Polegadas:</strong><br/>
-					                	  <select class="form-control" id="tipoDocumento" name="polegadas" >
-					   <?php
-						geraTipoOpcao("polegadas");
-						?>  
-					  </select>					</div>
-				  </div>
                   
-                  <div class="form-group">
-					<div class="col-md-offset-2 col-md-8"><br/>
-					<h5>Título</h5>
-                      </div>
-				  </div>
-                  
-                  <div class="form-group">
-					<div class="col-md-offset-2 col-md-8"><strong>Título *:</strong><br/>
-					  <input type="text" class="form-control" id="Nome" name="titulo"  value="" >
-					</div>
-				  </div>
-                  <div class="form-group">
-					<div class="col-md-offset-2 col-md-8"><strong>Título Uniforme *:</strong><br/>
-					  <input type="text" class="form-control" id="Nome" name="titulo_uniforme" value="" >
-					</div>
-				  </div>
-                  <div class="form-group">
-					<div class="col-md-offset-2 col-md-8"><strong>Conteúdo:</strong><br/>
-					 <textarea name="conteudo" class="form-control" rows="10" placeholder=""></textarea>
-					</div>
-				  </div>
-                  <div class="form-group">
-					<div class="col-md-offset-2 col-md-8"><strong>Notas:</strong><br/>
-					 <textarea name="notas" class="form-control" rows="10" placeholder=""></textarea>
-					</div>
-				  </div>
                   <div class="form-group">
 					<div class="col-md-offset-2 col-md-8"><strong>Observações:</strong><br/>
 					 <textarea name="obs" class="form-control" rows="10" placeholder=""></textarea>

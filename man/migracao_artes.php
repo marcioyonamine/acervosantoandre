@@ -76,8 +76,8 @@ break;
 	while($x = mysqli_fetch_array($query)){
 		$id = $x['id'];
 		$salao = $x['salao'];
-		$ano_aq = $x['ano_aquisicao']."-00-00";
-		$ano_as = $x['ano_obra']."-00-00";
+		$ano_aq = $x['ano_aquisicao'];
+		$ano_as = $x['ano_obra'];
 		$localizacao = $x['localizacao'];
 		$patrimonio = $x['patrimonio'];
 		$processo = $x['processo'];
@@ -102,19 +102,19 @@ break;
 	$antes = strtotime(date('Y-m-d H:i:s')); // note que usei hífen
 	echo "<h1>Criando os registros...</h1><br />";
 	$hoje = date('Y-m-d H:i:s');
-	$sql = "SELECT idDisco, titulo_disco FROM acervo_discoteca $teste";
+	$sql = "SELECT id, titulo FROM acervo_artes $teste";
 	$query = mysqli_query($con,$sql);
 	while($x = mysqli_fetch_array($query)){
-		$idDisco = $x['idDisco'];
-		$titulo = $x['titulo_disco'];
-		$sql_update = "INSERT INTO `acervo`.`acervo_registro` 
+		$id = $x['id'];
+		$titulo = $x['titulo'];
+		$sql_update = "INSERT INTO `acervo_registro` 
 		(`titulo`, `id_acervo`, `id_tabela`, `publicado`, `tabela`, `data_catalogacao`, `idUsuario`) 
-		VALUES ('$titulo', '7', '$idDisco', '1', '97', '$hoje', '1');";
+		VALUES ('$titulo', '2', '$id', '1', '126', '$hoje', '1');";
 		$query_update = mysqli_query($con,$sql_update);
 		if($query_update){
 			echo "Registro $titulo inserido. (1) <br />";	
 		}else{
-			echo "Erro ao inserir $titulo (2) <br />";
+			echo "Erro ao inserir $titulo (2) <br /> $sql_update <br />";
 			
 		}
 	}
@@ -128,64 +128,25 @@ break;
 	echo "<h1>Criando os registros...</h1><br />";
 	$hoje = date('Y-m-d H:i:s');
 	
-	$sql = "SELECT autoridade01, categoria01,
-	autoridade02, categoria02,
-	autoridade03, categoria03, 
-	autoridade04, categoria04, 
-	autoridade05, categoria05, 
-	autoridade06, categoria06, 
-	autoridade07, categoria07, 
-	autoridade08, categoria08, 
-	autoridade09, categoria09, 
-	autoridade10, categoria10,
-	idDisco
-	FROM temp_acervo_discoteca $teste"; 
+	$sql = "SELECT autor, id FROM temp_artes $teste"; 
 	$query = mysqli_query($con,$sql);
 	while($x = mysqli_fetch_array($query)){
-		for($i = 1; $i <= 10; $i++){
+		$termo = $x['autor'];
+		if($termo != "" AND $termo != NULL AND $termo != "."){	
+			$idTermo = recuperaIdTermo($termo,1);
+			$idCat = 126;
+			$idNovo = recuperaIdTemp($x['id'],126);
+			$idReg = idReg($idNovo,126);
+
+			$sql_insert = "INSERT INTO `acervo_relacao_termo` (`idRel`, `idReg`, `idTermo`, `idTipo`, `idCat`, `publicado`) 
+			VALUES ('', '$idReg', '$idTermo', '1', '$idCat', '1')";
+			$query_insert = mysqli_query($con,$sql_insert);
 			
-			if($i == 10){
-				$termo =  addslashes($x['autoridade10']);
-				$categoria = retiraParenteses($x['categoria10']);
+			if($query_insert){
+				echo "Termo $termo inserido em ID $idReg<br />";
 			}else{
-				$termo =  addslashes($x['autoridade0'.$i.'']);
-				$categoria = retiraParenteses($x['categoria0'.$i.'']);
+				echo "Erro.<br />";	
 			}
-			if($termo != "" AND $termo != NULL AND $termo != "."){	
-				
-				
-						
-				$idTermo = recuperaIdTermo($termo,1);
-				$idCat = recuperaIdTermo($categoria,78);
-				$idNovo = recuperaIdTemp($x['idDisco'],87);
-				$idReg = idReg($idNovo,87);
-				
-
-				if($idTermo == NULL OR $idTermo == 0){
-					$sql_insere = "INSERT INTO acervo_termo (termo, tipo, id_usuario, data_update, publicado)
-					VALUES ('$termo','1','1','$hoje','1')";	
-					$query_insere = mysqli_query($con,$sql_insere);
-					if($query_insere){
-						$idTermo = mysqli_insert_id($con);
-						echo "$termo inserido na base termos<br />";	
-					}else{
-						echo "Erro ao inserir o $termo<br />";
-						}
-				}
-
-				$sql_insert = "INSERT INTO `acervo_relacao_termo` (`idRel`, `idReg`, `idTermo`, `idTipo`, `idCat`, `publicado`) 
-				VALUES ('', '$idReg', '$idTermo', '1', '$idCat', '1')";
-				$query_insert = mysqli_query($con,$sql_insert);
-				
-				if($query_insert){
-					echo "Termo $termo inserido em ID $idReg<br />";
-				}else{
-					echo "Erro.<br />";	
-				}
-
-				//echo var_dump($idTermo)."<br />";
-			}
-
 		}
 	}
 	
@@ -362,6 +323,38 @@ break;
 	
 	break;
 
+	case "importa_tb":
+	
+	//Sistema de controle de tempo
+	$antes = strtotime(date('Y-m-d H:i:s')); // note que usei hífen
+	echo "<h1>Importando autoridades...</h1><br />";
+	$hoje = date('Y-m-d H:i:s');
+	
+	
+	// idioma
+	$sql = "SELECT * FROM tb_idioma";
+	$query = mysqli_query($con,$sql);
+	echo $sql;
+	while($x = mysqli_fetch_array($query)){
+		$des = $x['DESCRICAO'];
+		$sql_insert = "INSERT INTO acervo_tipo (tipo, abreviatura) VALUES ('$des','lingua')";
+		$query_insert = mysqli_query($con,$sql_insert);
+		if($query_insert){
+			echo "$des inserido com sucesso. <br />";	
+		}else{
+				$sql_insert."<br />";
+		}
+	}
+	
+	
+	
+
+	$depois = strtotime(date('Y-m-d H:i:s'));
+	$tempo = $depois - $antes;
+	echo "<br /><br /> Importação executada em $tempo segundos";
+	
+	
+	break;
 	
 	
 	case "inicio":
@@ -384,13 +377,20 @@ break;
 <br />
 <a href="?action=relacao_sem_autoridades">Relações SEM Autoridades (INSERT)</a><br />
 <br />
+<a href="?action=relacao_autoridades">Relações Autoridades (INSERT)</a><br />
+<br />
+
 <a href="?action=analitica">Criar relações Matriz / Analítica (UPDATE)</a><br />
 <br />
 
 <a href="?action=tombo_update">Atualizao tombo antigo na base nova (UPDATE)</a><br />
 <br />
 
+<a href="?action=registros">Insere no registro  (INSERT)</a><br />
+<br />
+
+<a href="?action=importa_tb">Inporta TB  (INSERT)</a><br />
+<br />
 <?php 
 break;
-
 } ?>

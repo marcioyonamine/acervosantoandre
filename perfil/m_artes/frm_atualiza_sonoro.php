@@ -2,72 +2,36 @@
 $con = bancoMysqli();
 include 'includes/menuSonoro.php';
 
-
-
-
-function dataAcervo($tipo,$data){
-	switch($tipo){
-	case 5: //ano
-	
-	break;
-	case 6: //Século
-	
-	break;
-	case 7: // MM/AAAA
-	
-	break;
-	case 8: // DD/MM/AAAA
-	
-	break;
-	
-		
-	}
-
-	
-}
-
-
-
 if(isset($_POST['cadastraRegistro']) OR isset($_POST['atualizaRegistro'])){
-	if(isset($_POST['fim'])){
-		$fim = 1;	
-	}else{
-		$fim = 0;	
-	}
-	$planilha = 17;
+	
+  	$colecao = $_POST["colecao"];
+    $salao = $_POST["salao"];
+    $ano_aq = $_POST["ano_aq"];
+    $ano_as = $_POST["ano_as"];
+    $patrimonio = $_POST["patrimonio"];
+    $processo = $_POST["processo"];
+    $altura = $_POST["altura"];
+    $largura = $_POST["largura"];
+    $profundidade = $_POST["profundidade"];
+    $moeda = $_POST["moeda"];
+    $valor = $_POST["valor"];
+    $localizacao = $_POST["localizacao"];
+    $id = $_POST["cadastraRegistro"];
 	$hoje = date("Y-m-d H:i:s");
-	$colecao = $_POST['colecao'];
-	$tombo = $_POST['tombo'];
-	$geral = $_POST['geral'];
-	$especifico = $_POST['especifico'];
-	$faixas = $_POST['faixas'];
-	$exemplares = $_POST['exemplares'];
-	$gravadora = $_POST['gravadora'];
-	$registro = $_POST['registro'];
-	$tipo_data = $_POST['tipo_data'];
-	$data_gravacao = $_POST['data_gravacao'];
-	$local = $_POST['local'];
-	$fisico = $_POST['fisico'];
-	$estereo = $_POST['estereo'];
-	$polegadas = $_POST['polegadas'];
 	$titulo = addslashes($_POST['titulo']);
-	$titulo_uniforme = addslashes($_POST['titulo_uniforme']);
-	$conteudo = addslashes($_POST['conteudo']);
-	$notas = addslashes($_POST['notas']);
 	$obs = addslashes($_POST['obs']);
 	$publicado = 1;
 	$catalogador = $_SESSION['idUsuario'];
+	$colecao_acervo = 2;
 }
 
 if(isset($_POST['cadastraRegistro'])){
-	$sql_insere = "INSERT INTO `acervo_discoteca` 
-	(`planilha`, `catalogador`, `tipo_geral`, `tipo_especifico`, `tombo`, `gravadora`, `registro`, `tipo_data`, `data_gravacao`, `local_gravacao`, `descricao_fisica`, `polegadas`, `faixas`, `titulo_disco`, `titulo_uniforme`, `conteudo`, `notas`, `obs`, `exemplares`) 
-	VALUES ('$planilha', '$catalogador', '$geral', '$especifico', '$tombo', '$gravadora', '$registro', '$tipo_data', '$data_gravacao', '$local', '$fisico', '$polegadas', '$faixas', '$titulo', '$titulo_uniforme', '$conteudo', '$notas', '$obs', '$exemplares');";
+	$sql_insere = "INSERT INTO `acervo_artes` (`id`, `salao`, `ano_aquisicao`, `ano_assinatura`, `localizacao`, `patrimonio`, `pa_aquisicao`, `titulo`, `altura`, `largura`, `profundidade`, `moeda`, `valor`, `obs`, `idAntigo`) VALUES (NULL, '$salao', '$ano_aq', '$ano_as', '$localizacao','$patrimonio', '$processo', '$titulo', '$altura', '$largura', '$profundidade', '$moeda', '$valor', '$obs',  '');";
 	$query_insere = mysqli_query($con,$sql_insere);
 	if($query_insere){
 		$ultimo = mysqli_insert_id($con);
 		$sql_insert_registro = "INSERT INTO `acervo`.`acervo_registro` (`id_registro`, `titulo`, `id_autoridade`, `id_acervo`, `id_tabela`, `publicado`, `tabela`, `data_catalogacao`, `idUsuario`) 
-		VALUES (NULL, '$titulo', '', '$colecao', '$ultimo', '1','87','$hoje','$catalogador')";
+		VALUES (NULL, '$titulo', '', '$colecao_acervo', '$ultimo', '1','126','$hoje','$catalogador')";
 		$query_insert_registro = mysqli_query($con,$sql_insert_registro);
 		
 		if($query_insert_registro){
@@ -83,29 +47,26 @@ $_SESSION['idDisco'] = $ultimo;
 
 if(isset($_POST['atualizaRegistro'])){
 	$ultimo = $_SESSION['idDisco'];
-	$sql_atualiza = "UPDATE `acervo_discoteca` SET 
-	`planilha` = '$planilha', 
-	`catalogador` = '$catalogador', 
-	`tipo_geral` =  '$geral', 
-	`tipo_especifico` = '$especifico', 
-	`tombo` = '$tombo', 
-	`estereo` = '$estereo', 
-	`gravadora` = '$gravadora', 
-	`registro` = '$registro', 
-	`tipo_data` = '$tipo_data', 
-	`data_gravacao` = '$data_gravacao', 
-	`local_gravacao` = '$local', 
-	`descricao_fisica` = '$fisico', 
-	`polegadas` = '$polegadas', 
-	`faixas` = '$faixas', 
-	`titulo_disco` = '$titulo', 
-	`titulo_uniforme` =  '$titulo_uniforme', 
-	`conteudo` = '$conteudo', 
-	`notas` = '$notas', 
-	`obs` = '$obs', 
-		`fim` = '$fim', 
-	`exemplares` = '$exemplares'
-	 WHERE idDisco = '$ultimo'";
+	$sql_atualiza = "UPDATE `acervo_artes` SET
+	`salao`=    $salao,
+	ano_aquisicao`= $ano_aq,
+	`ano_assinatura`= $ano_as,
+	`localizacao`= $ localizacao ,
+	`patrimonio`= $patrimonio,
+	`pa_aquisicao`= $processo,
+	`titulo`= $titulo,
+	`altura`= $altura ,
+	`largura`= $largura,
+	`profundidade`= $profundidade ,
+	`moeda`= $moeda ,
+	`valor`= $valor ,
+	`obs`= $obs
+	    
+	
+	WHERE id = '$id';";
+	
+	
+     
 	$query_atualiza = mysqli_query($con,$sql_atualiza);
 	if($query_atualiza){
 		$sql_update_registro = "UPDATE `acervo_registro` SET

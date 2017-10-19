@@ -1,6 +1,6 @@
 <?php
 //geram o insert pro framework da igsis
-$pasta = "?perfil=discoteca&p=";
+$pasta = "?perfil=artes&p=";
 ?>
 
 
@@ -8,7 +8,7 @@ $pasta = "?perfil=discoteca&p=";
 			<div id="dl-menu" class="dl-menuwrapper">
 						<button class="dl-trigger">Open Menu</button>
 						<ul class="dl-menu">
-						<li><a href="<?php echo $pasta."frm_lista_sonoro"; ?>">Listar registros</a></li>
+						<li><a href="<?php echo $pasta."frm_lista"; ?>">Listar registros</a></li>
 						<li><a href="<?php echo $pasta."frm_insere_sonoro"; ?>">Inserir registro</a></li>
 						<li><a href="<?php echo $pasta."frm_busca_sonoro"; ?>">Busca registro</a></li>
                       	<!--<li><a href="#">Autoridades</a>	
